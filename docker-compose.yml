@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: intellisight-postgres
+    restart: unless-stopped
+    ports:
+      - '5000:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: zeeshan
+      POSTGRES_DB: FYP_Intellisight
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - intellisight-network
+
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: intellisight-backend
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:zeeshan@postgres:5432/FYP_Intellisight?schema=public
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-this-in-production-min-32-chars}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      BCRYPT_ROUNDS: ${BCRYPT_ROUNDS:-10}
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - intellisight-network
+    healthcheck:
+      test: ['CMD', 'node', '-e', "require('http').get('http://localhost:3000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Run migrations before starting
+    command: sh -c "npx prisma migrate deploy && node src/server.js"
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  intellisight-network:
+    driver: bridge

@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  Admin_ID  Int         @id @default(autoincrement())
+  Name      String?
+  Email     String?     @unique
+  Password  String?
+  Role      String?
+  TimeTable TimeTable[]
+
+  @@map("Admin")
+}
+
+model Zone {
+  Zone_id   Int         @id @default(autoincrement())
+  Zone_Name String?
+  Camara    Camara[]
+  Students  Students[]
+  Teacher   Teacher[]
+  TimeTable TimeTable[]
+
+  @@map("Zone")
+}
+
+model Camara {
+  Camara_Id Int        @id @default(autoincrement())
+  Password  String?
+  Zone_id   Int?
+  zone      Zone?      @relation(fields: [Zone_id], references: [Zone_id])
+  Teacher   Teacher[]
+  Students  Students[]
+
+  @@map("Camara")
+}
+
+model Teacher {
+  Teacher_ID    Int         @id @default(autoincrement())
+  Name          String?
+  Face_Pictures String?
+  Email         String?
+  Camara_Id     Int?
+  Zone_id       Int?
+  camara        Camara?     @relation(fields: [Camara_Id], references: [Camara_Id])
+  zone          Zone?       @relation(fields: [Zone_id], references: [Zone_id])
+  TimeTable     TimeTable[]
+
+  @@map("Teacher")
+}
+
+model Students {
+  Student_ID    Int         @id @default(autoincrement())
+  Name          String?
+  Face_Pictures String?
+  Email         String?
+  Camara_Id     Int?
+  Zone_id       Int?
+  camara        Camara?     @relation(fields: [Camara_Id], references: [Camara_Id])
+  zone          Zone?       @relation(fields: [Zone_id], references: [Zone_id])
+  TimeTable     TimeTable[]
+
+  @@map("Students")
+}
+
+model TimeTable {
+  TimeTable_ID Int       @id @default(autoincrement())
+  EntryTime    DateTime?
+  ExitTime     DateTime?
+  PersonType   String? // "TEACHER" or "STUDENT"
+  Admin_ID     Int?
+  Teacher_ID   Int?
+  Student_ID   Int?
+  Zone_id      Int?
+  admin        Admin?    @relation(fields: [Admin_ID], references: [Admin_ID])
+  teacher      Teacher?  @relation(fields: [Teacher_ID], references: [Teacher_ID])
+  student      Students? @relation(fields: [Student_ID], references: [Student_ID])
+  zone         Zone?     @relation(fields: [Zone_id], references: [Zone_id])
+
+  @@map("TimeTable")
+}
+
+model UnknownFaces {
+  Unknown_ID     Int       @id @default(autoincrement())
+  Captured_Image Bytes?
+  DetectedTime   DateTime  @default(now())
+  Zone_id        Int?
+  Confidence     Float?
+  Status         String?   @default("PENDING") // PENDING, IDENTIFIED, IGNORED
+  Notes          String?
+  CreatedAt      DateTime  @default(now())
+
+  @@map("UnknownFaces")
+}

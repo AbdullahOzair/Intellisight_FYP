@@ -1,0 +1,47 @@
+{
+  "name": "intellisight-dashboard",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "IntelliSight Admin Dashboard - Real-time Zone Tracking for Students & Teachers",
+  "private": true,
+  "dependencies": {
+    "axios": "^1.6.2",
+    "date-fns": "^3.0.0",
+    "face-api.js": "^0.22.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.12.0",
+    "react-router-dom": "^6.20.0",
+    "react-webcam": "^7.2.0",
+    "recharts": "^2.10.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.3.6",
+    "vite": "^5.0.7"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
